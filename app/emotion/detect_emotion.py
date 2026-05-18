@@ -16,7 +16,7 @@ def detect_emotion():
             enforce_detection=False
         )
 
-        emottion = result[0]['dominant_emotion']
+        emotion = result[0]['dominant_emotion']
     except Exception:
         emotion = "neutral"
 
