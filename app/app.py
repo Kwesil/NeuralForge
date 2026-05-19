@@ -12,13 +12,15 @@ recommendations = {
 }
 
 if st.button("Analyze Emotion"):
-    emotion = detect_emotion()
-
-    st.success(f"Detected Emotion: {emotion}")
-
-    recs = recommendations.get(emotion, ["City Grill"])
     
-    st.write("recommendation Restaurants:")
+    with st.spinner("Analysing emotional context..."):
 
-    for r in recs:
-        st.write(f"- {r}")
+        result = detect_emotion()
+
+        dominant_emotion = result["dominant_emotion"]
+        emotion_scores = result["emotion_scores"]
+
+    st.success(f"Detected Emotion: {dominant_emotion}")
+
+    st.write("Emotion Confidence Scores")
+    st.json(emotion_scores)
