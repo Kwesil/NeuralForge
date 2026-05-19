@@ -1,18 +1,14 @@
 import streamlit as st
 from emotion.detect_emotion import detect_emotion
 from utils.context_mapper import map_emotion_to_context
+from recommender.recommend import get_recommendations
 
 st.set_page_config(page_title="NeuralForge", layout="centered")
 
 st.title("NeuralForge")
 st.subheader("Emotion-Aware Restaurant Recommendation Agent")
     
-recommendations = {
-    "happy": ["Sushi Spot", "BBQ House"],
-    "sad": ["Comfort Bites", "Warm Soup Cafe"],
-    "angry": ["Quiet Garden Reataurant"],
-    "neutral": ["City Grill"]
-}
+
 
 if st.button("Analyze Emotion"):
     
@@ -24,6 +20,9 @@ if st.button("Analyze Emotion"):
         emotion_scores = result["emotion_scores"]
 
         behavioral_context = map_emotion_to_context(emotion_scores)
+        recommendations = get_recommendations(
+            behavioral_context["context"]
+        )
 
     st.success(f"Detected Emotion: {dominant_emotion}")
 
@@ -34,3 +33,8 @@ if st.button("Analyze Emotion"):
     st.info(behavioral_context["context"])
 
     st.write(behavioral_context["description"])
+
+    st.write("### Recommended Restaurants")
+
+    for restaurant in recommendations:
+        st.write(f"🍽️{restaurant}")
