@@ -1,31 +1,43 @@
-RECOMMENDATIONS = {
-    "comfort_seeking": [
-        "Warm Bowl Ramen",
-        "Cozy Corner Cafe",
-        "Comfort Kitchen"
-    ],
+import random
 
-    "stress_relief": [
-        "Quiet Garden Restauurant",
-        "Nature Grill",
-        "Zen Bistro"
-    ],
+def filter_restaurants(df, context):
+    if context == "comfort_seeking":
+        keywords = [
+            "Cafe",
+            "Coffee",
+            "Soup",
+            "Ramen",
+            "Tea"
+        ]
 
-    "social_expoloration": [
-        "Fushion Lounge",
-        "Spice Route",
-        "Street Feast Hub"
-    ],
+    elif context == "stress_relief":
+        keywords = [
+            "Garden",
+            "Healthy",
+            "Vegatarian",
+            "Seafood"
+        ]
+    
+    elif context == "social_exploration":
+        keywords = [
+            "American",
+            "Italian",
+            "Burgers"
+        ]
 
-    "balanced": [
-        "City Grill",
-        "Urban Table",
-        "Harvest Bistro"
+    filtered = df[
+        df["categories"].str.contains(
+            "|".join(keywords),
+            case=False,
+            na=False
+        )
     ]
-}
 
-def get_recommendations(context):
-    return RECOMMENDATIONS.get(
-        context, 
-        RECOMMENDATIONS["balanced"]
+    if len(filtered) == 0:
+        filtered = df
+
+    recommendations = filtered.sample(
+        min(5, len(filtered))
     )
+
+    return recommendations.to_dict(orient="records")
