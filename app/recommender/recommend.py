@@ -1,6 +1,7 @@
 import random
 
 def filter_restaurants(df, context):
+    keywords = []
     if context == "comfort_seeking":
         keywords = [
             "Cafe",
@@ -23,6 +24,12 @@ def filter_restaurants(df, context):
             "American",
             "Italian",
             "Burgers"
+        ]
+
+    else: 
+        # Fallback safety
+        keywords = [
+            "Restaurant"
         ]
 
     filtered = df[
