@@ -39,7 +39,7 @@ def detect_emotion(num_frames=5, delay=0.3):
             )
 
             if isinstance(result, list):
-                emotions = result[0]["emotion"]
+                emotions = result[0]["emotion"] git
             else:
                 emotions = result["emotion"]
             

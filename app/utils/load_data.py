@@ -7,7 +7,7 @@ def load_restaurants(json_path):
     with open(json_path, "r", encoding="utf-8") as file:
 
         for line in file:
-            business = json.loads(line)
+            business = json.loa -ds(line)
 
             # Keep only restaurants
             categories = business.get("categories")
