@@ -3,6 +3,9 @@ from emotion.detect_emotion import detect_emotion
 from utils.context_mapper import map_emotion_to_context
 from utils.load_data import load_restaurants
 from recommender.recommend import filter_restaurants
+from recommender.embedding_model import (create_combuned_features, create_embeddings)
+from recommender.ranker import recommend_restaurants
+from utils.context_query import context_to_query
 
 st.set_page_config(page_title="NeuralForge", layout="centered")
 
@@ -11,6 +14,14 @@ st.subheader("Emotion-Aware Restaurant Recommendation Agent")
     
 restaurant_df = load_restaurants(
     "data/yelp_academic_dataset_business.json"
+)
+
+restaurant_df = create_combuned_features(
+    restaurant_df
+)
+
+embeddings = create_embeddings(
+    restaurant_df
 )
 
 if st.button("Analyze Emotion"):
@@ -23,9 +34,14 @@ if st.button("Analyze Emotion"):
         emotion_scores = result["emotion_scores"]
 
         behavioral_context = map_emotion_to_context(emotion_scores)
-        recommendations = filter_restaurants(
-            restaurant_df,
+
+        query = context_to_query(
             behavioral_context["context"]
+        )
+        recommendations = recommend_restaurants(
+            query,
+            restaurant_df,
+            embeddings
         )
 
     st.success(f"Detected Emotion: {dominant_emotion}")
@@ -40,7 +56,8 @@ if st.button("Analyze Emotion"):
 
     st.write("### Recommended Restaurants")
 
-    for restaurant in recommendations:
+    for _, restaurant in recommendations.iterrows():
+
         st.markdown(f"""
         ### 🍽️{restaurant['name']}
 
