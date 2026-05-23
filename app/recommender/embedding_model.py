@@ -4,7 +4,7 @@ embedding_model = SentenceTransformer(
     "all-MiniLM-l6-v2"
 )
 
-def create_combuned_features(df):
+def create_combined_features(df):
     df["combined_features"] = (
         df["categories"].fillna("") + " " + df["city"].fillna("")
     )
