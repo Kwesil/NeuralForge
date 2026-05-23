@@ -15,7 +15,7 @@ def filter_restaurants(df, context):
         keywords = [
             "Garden",
             "Healthy",
-            "Vegatarian",
+            "Vegetarian",
             "Seafood"
         ]
     
