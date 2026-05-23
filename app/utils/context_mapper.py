@@ -24,7 +24,7 @@ def map_emotion_to_context(emotion_scores):
             "description": "User may prefer calm environments and low-friction experiences."
         }
     
-    # Social/adventurous behaviour
+    # Social-exploration behaviour
     elif happy > 45 or surprise > 30:
         return {
             "context": "social_exploration",
