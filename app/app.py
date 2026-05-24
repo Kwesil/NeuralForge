@@ -1,4 +1,6 @@
+import os
 import random
+import socket
 import pandas as pd
 import streamlit as st
 from collections import Counter
@@ -27,6 +29,10 @@ def jitter(base_scores):
         for k, v in base_scores.items()
     }
 # ──────────────────────────────────────────────────────────────────
+
+def is_cloud():
+    """Detect if running on Streamlit Cloud — no camera available."""
+    return os.environ.get("HOME") == "/home/adminuser"
 
 st.set_page_config(
     page_title="NeuralForge",
@@ -300,16 +306,26 @@ st.markdown("NeuralForge detects your emotional state and recommends restaurants
 restaurant_df = get_restaurants()
 embeddings = get_embeddings(restaurant_df)
 
-# ── Mood input ─────────────────────────────────────────────────────
-st.markdown("**Scan your face to detect your current emotional state.**")
-scan = st.button("⬡  Scan My Emotion")
 
-with st.expander("No camera? Select mood manually instead"):
+
+# ── Mood input ─────────────────────────────────────────────────────
+if is_cloud():
+    st.info("📍 Running on Streamlit Cloud — camera unavailable. Select your mood below.")
     manual_mood = st.selectbox(
-        "",
+        "Select your current mood:",
         ["", "Happy 😄", "Sad 😔", "Stressed 😤", "Neutral 😐"],
         key=f"manual_mood_{st.session_state['selectbox_key']}"
     )
+    scan = st.button("⬡  Get Recommendations")
+else:
+    st.markdown("**Scan your face to detect your current emotional state.**")
+    scan = st.button("⬡  Scan My Emotion")
+    with st.expander("No camera? Select mood manually instead"):
+        manual_mood = st.selectbox(
+            "",
+            ["", "Happy 😄", "Sad 😔", "Stressed 😤", "Neutral 😐"],
+            key=f"manual_mood_{st.session_state['selectbox_key']}"
+        )
 
 # ── Mood map ───────────────────────────────────────────────────────
 MOOD_MAP = {
