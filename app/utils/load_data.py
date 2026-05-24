@@ -7,11 +7,12 @@ def load_restaurants(json_path):
     if not os.path.exists(json_path):
         os.makedirs("data", exist_ok=True)
         gdown.download(
-            "https://drive.google.com/file/d/1NxI4SqK1qLXXh9_PXjLI7uzPm-O2LaOI/view?usp=drive_link",
+            "https://drive.google.com/uc?id=1NxI4SqK1qLXXh9_PXjLI7uzPm-O2LaOI",
             json_path,
-            quiet=False
+            quiet=False,
+            fuzzy=True
         )
-    
+
     data = []
     with open(json_path, "r", encoding="utf-8") as file:
         for line in file:
