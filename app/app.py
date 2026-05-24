@@ -53,6 +53,9 @@ if "previous_contexts" not in st.session_state:
 if "selectbox_key" not in st.session_state:
     st.session_state["selectbox_key"] = 0
 
+if "results_shown" not in st.session_state:
+    st.session_state.results_shown = False
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
@@ -366,7 +369,11 @@ embeddings = get_embeddings(restaurant_df)
 if is_cloud():
     st.info("📍 Running on Streamlit Cloud — take a photo or select mood manually.")
 
-    camera_image = st.camera_input("Take a photo to detect your emotion")
+    if not st.session_state.results_shown:
+        camera_image = st.camera_input("Take a photo to detect your emotion")
+    else:
+        camera_image = None
+        st.success("✓ Photo analysed. Scroll down to see results.")
 
     with st.expander("Prefer to select manually instead?"):
         manual_mood = st.selectbox(
@@ -444,6 +451,11 @@ if scan:
     dominant_emotion   = result["dominant_emotion"]
     emotion_scores     = result["emotion_scores"]
     behavioral_context = map_emotion_to_context(emotion_scores)
+
+    st.session_state.results_shown = True
+    st.session_state["selectbox_key"] += 1
+    st.session_state.results_shown = False
+
 
     # ── Update session memory ──────────────────────────────────────
     st.session_state.scan_history.append(dominant_emotion)
