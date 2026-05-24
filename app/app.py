@@ -362,8 +362,14 @@ if scan:
         }
         detection_method = "manual input"
     else:
+        if is_cloud():
+            st.warning("Please select a mood from the dropdown first.")
+            st.stop()
         with st.spinner("Scanning facial expression..."):
             result = detect_emotion()
+        if result is None:
+            st.warning("Camera not detected. Please select a mood manually.")
+            st.stop()
         detection_method = "facial scan"
 
     dominant_emotion   = result["dominant_emotion"]
