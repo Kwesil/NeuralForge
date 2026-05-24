@@ -1,6 +1,5 @@
 import os
 import random
-import socket
 import pandas as pd
 import streamlit as st
 from collections import Counter
@@ -23,16 +22,14 @@ def get_embeddings(_df):
     return create_embeddings(_df)
 
 def jitter(base_scores):
-    """Add slight randomness to emotion scores so each scan feels unique."""
     return {
         k: round(max(0, v + random.uniform(-8, 8)), 2)
         for k, v in base_scores.items()
     }
-# ──────────────────────────────────────────────────────────────────
 
 def is_cloud():
-    """Detect if running on Streamlit Cloud — no camera available."""
     return os.environ.get("HOME") == "/home/adminuser"
+# ──────────────────────────────────────────────────────────────────
 
 st.set_page_config(
     page_title="NeuralForge",
@@ -54,10 +51,38 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
 
-html, body, [class*="css"] {
+/* ── Force dark mode regardless of system preference ── */
+html, body, [class*="css"], .stApp {
     font-family: 'Syne', sans-serif;
-    background-color: #080c10;
-    color: #c8d8e8;
+    background-color: #080c10 !important;
+    color: #c8d8e8 !important;
+}
+
+/* Override Streamlit light mode */
+.stApp {
+    background-color: #080c10 !important;
+}
+
+[data-testid="stAppViewContainer"] {
+    background-color: #080c10 !important;
+}
+
+[data-testid="stHeader"] {
+    background-color: #080c10 !important;
+}
+
+[data-testid="stSidebar"] {
+    background-color: #0d1520 !important;
+}
+
+/* Force all text to be light */
+p, div, span, label, h1, h2, h3, h4, h5, h6 {
+    color: #c8d8e8 !important;
+}
+
+/* Streamlit native text elements */
+.stMarkdown, .stText {
+    color: #c8d8e8 !important;
 }
 
 #MainMenu, footer, header { visibility: hidden; }
@@ -88,15 +113,15 @@ body::before {
     font-weight: 800;
     font-size: 3.8rem;
     letter-spacing: -2px;
-    color: #ffffff;
+    color: #ffffff !important;
     line-height: 1;
     margin: 0;
 }
-.nf-logo span { color: #00ffb4; }
+.nf-logo span { color: #00ffb4 !important; }
 .nf-tagline {
     font-family: 'Space Mono', monospace;
     font-size: 0.75rem;
-    color: #4a7a6a;
+    color: #4a7a6a !important;
     letter-spacing: 3px;
     text-transform: uppercase;
     margin-top: 0.6rem;
@@ -113,14 +138,14 @@ body::before {
     padding: 0.3rem 0.8rem;
     border-radius: 2px;
     border: 1px solid rgba(0,255,180,0.3);
-    color: #00ffb4;
+    color: #00ffb4 !important;
     background: rgba(0,255,180,0.05);
 }
 
 div.stButton > button {
-    background: transparent;
-    border: 1.5px solid #00ffb4;
-    color: #00ffb4;
+    background: transparent !important;
+    border: 1.5px solid #00ffb4 !important;
+    color: #00ffb4 !important;
     font-family: 'Space Mono', monospace;
     font-size: 0.8rem;
     letter-spacing: 2px;
@@ -131,8 +156,8 @@ div.stButton > button {
     transition: all 0.2s ease;
 }
 div.stButton > button:hover {
-    background: #00ffb4;
-    color: #080c10;
+    background: #00ffb4 !important;
+    color: #080c10 !important;
     box-shadow: 0 0 24px rgba(0,255,180,0.4);
 }
 
@@ -143,6 +168,18 @@ div[data-baseweb="select"] > div {
     font-family: 'Space Mono', monospace !important;
     font-size: 0.8rem !important;
     border-radius: 2px !important;
+}
+
+/* Selectbox dropdown options */
+[data-baseweb="menu"] {
+    background-color: #0d1520 !important;
+}
+[data-baseweb="menu"] li {
+    color: #c8d8e8 !important;
+    background-color: #0d1520 !important;
+}
+[data-baseweb="menu"] li:hover {
+    background-color: rgba(0,255,180,0.1) !important;
 }
 
 details {
@@ -159,12 +196,25 @@ details summary {
     padding: 0.6rem 1rem !important;
 }
 
+/* Info/warning boxes */
+[data-testid="stAlert"] {
+    background-color: rgba(0,255,180,0.05) !important;
+    border-color: rgba(0,255,180,0.2) !important;
+    color: #c8d8e8 !important;
+}
+
+/* Camera input */
+[data-testid="stCameraInput"] {
+    background-color: #0d1520 !important;
+    border-color: rgba(0,255,180,0.2) !important;
+}
+
 .nf-section-label {
     font-family: 'Space Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: #00ffb4;
+    color: #00ffb4 !important;
     opacity: 0.7;
     margin-bottom: 0.75rem;
     margin-top: 2.5rem;
@@ -179,7 +229,7 @@ details summary {
     font-family: 'Space Mono', monospace;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #00ffb4;
+    color: #00ffb4 !important;
     letter-spacing: 2px;
     text-transform: uppercase;
     margin-bottom: 1rem;
@@ -195,13 +245,13 @@ details summary {
 .nf-context-card .ctx-label {
     font-family: 'Space Mono', monospace;
     font-size: 0.7rem;
-    color: #00ffb4;
+    color: #00ffb4 !important;
     letter-spacing: 2px;
     text-transform: uppercase;
 }
 .nf-context-card .ctx-desc {
     font-size: 0.95rem;
-    color: #8aa8b8;
+    color: #8aa8b8 !important;
     margin-top: 0.3rem;
 }
 
@@ -226,10 +276,10 @@ details summary {
 }
 .nf-restaurant-card:hover { border-color: rgba(0,255,180,0.25); transform: translateY(-2px); }
 .nf-restaurant-card:hover::before { opacity: 1; }
-.nf-card-name { font-weight: 600; font-size: 1rem; color: #e8f4f0; margin-bottom: 0.5rem; line-height: 1.3; }
-.nf-card-meta { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: #4a7a6a; margin-bottom: 0.2rem; }
-.nf-card-stars { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #00ffb4; margin-top: 0.6rem; }
-.nf-card-categories { font-size: 0.72rem; color: #3a5a5a; margin-top: 0.4rem; line-height: 1.4; }
+.nf-card-name { font-weight: 600; font-size: 1rem; color: #e8f4f0 !important; margin-bottom: 0.5rem; line-height: 1.3; }
+.nf-card-meta { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: #4a7a6a !important; margin-bottom: 0.2rem; }
+.nf-card-stars { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #00ffb4 !important; margin-top: 0.6rem; }
+.nf-card-categories { font-size: 0.72rem; color: #3a5a5a !important; margin-top: 0.4rem; line-height: 1.4; }
 
 .nf-review-block {
     background: #0d1520;
@@ -242,14 +292,14 @@ details summary {
 .nf-review-restaurant {
     font-family: 'Space Mono', monospace;
     font-size: 0.7rem;
-    color: #4a7a6a;
+    color: #4a7a6a !important;
     letter-spacing: 2px;
     text-transform: uppercase;
     margin-bottom: 0.8rem;
 }
 .nf-review-reasoning {
     font-size: 0.78rem;
-    color: #4a7a6a;
+    color: #4a7a6a !important;
     font-family: 'Space Mono', monospace;
     margin-bottom: 1rem;
     line-height: 1.6;
@@ -258,7 +308,7 @@ details summary {
 }
 .nf-review-quote {
     font-size: 1.05rem;
-    color: #c8d8e8;
+    color: #c8d8e8 !important;
     line-height: 1.75;
     font-style: italic;
 }
@@ -274,7 +324,7 @@ details summary {
 .nf-review-rating {
     font-family: 'Space Mono', monospace;
     font-size: 0.8rem;
-    color: #00ffb4;
+    color: #00ffb4 !important;
     margin-top: 1rem;
     letter-spacing: 1px;
 }
@@ -306,14 +356,12 @@ st.markdown("NeuralForge detects your emotional state and recommends restaurants
 restaurant_df = get_restaurants()
 embeddings = get_embeddings(restaurant_df)
 
-
-
 # ── Mood input ─────────────────────────────────────────────────────
 if is_cloud():
     st.info("📍 Running on Streamlit Cloud — take a photo or select mood manually.")
- 
+
     camera_image = st.camera_input("Take a photo to detect your emotion")
- 
+
     with st.expander("Prefer to select manually instead?"):
         manual_mood = st.selectbox(
             "Select mood",
@@ -321,9 +369,9 @@ if is_cloud():
             key=f"manual_mood_{st.session_state['selectbox_key']}",
             label_visibility="collapsed"
         )
- 
+
     scan = st.button("⬡  Get Recommendations")
- 
+
 else:
     st.markdown("**Scan your face to detect your current emotional state.**")
     scan = st.button("⬡  Scan My Emotion")
@@ -370,12 +418,12 @@ if scan:
             "emotion_scores": jitter(base["emotion_scores"])
         }
         detection_method = "manual input"
- 
+
     elif camera_image is not None:
         with st.spinner("Analysing your photo..."):
             result = detect_emotion_from_image(camera_image)
         detection_method = "camera photo"
- 
+
     else:
         if is_cloud():
             st.warning("⚠️ Please take a photo or select a mood first.")
@@ -434,7 +482,6 @@ if scan:
     # ── Results ────────────────────────────────────────────────────
     st.markdown('<hr class="nf-divider">', unsafe_allow_html=True)
 
-    # Cognitive pipeline — collapsed by default
     with st.expander("◈ View NeuralForge Cognitive Pipeline", expanded=False):
         for step in PIPELINE_STEPS:
             st.markdown(f"""
@@ -499,18 +546,18 @@ if scan:
             <div class="ctx-desc">NeuralForge confidence: <strong>{match_score}%</strong></div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         st.markdown('<p class="nf-section-label">AI-Simulated Review</p>', unsafe_allow_html=True)
 
-        reasoning     = review_data.get("reasoning", "")
-        review_text   = review_data["review"]
-        rating        = review_data["rating"]
-        rating_int    = int(rating)
-        stars_full    = "★" * rating_int
-        stars_empty   = "☆" * (5 - rating_int)
+        reasoning       = review_data.get("reasoning", "")
+        review_text     = review_data["review"]
+        rating          = review_data["rating"]
+        rating_int      = int(rating)
+        stars_full      = "★" * rating_int
+        stars_empty     = "☆" * (5 - rating_int)
         restaurant_name = sample_restaurant["name"]
 
-        review_html = f'<div class="nf-review-block">'
+        review_html  = '<div class="nf-review-block">'
         review_html += f'<div class="nf-review-restaurant">Simulated review for · {restaurant_name}</div>'
         if reasoning:
             review_html += f'<div class="nf-review-reasoning">{reasoning}</div>'
