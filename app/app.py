@@ -28,7 +28,13 @@ def jitter(base_scores):
     }
 
 def is_cloud():
-    return os.environ.get("HOME") == "/home/adminuser"
+    """Detect if running on Streamlit Cloud."""
+    # Streamlit Cloud sets this env variable
+    return (
+        os.environ.get("HOME") == "/home/adminuser" or
+        os.path.exists("/mount/src") or
+        os.environ.get("STREAMLIT_SHARING_MODE") is not None
+    )
 # ──────────────────────────────────────────────────────────────────
 
 st.set_page_config(
