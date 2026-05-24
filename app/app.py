@@ -4,7 +4,7 @@ import socket
 import pandas as pd
 import streamlit as st
 from collections import Counter
-from emotion.detect_emotion import detect_emotion
+from emotion.detect_emotion import detect_emotion, detect_emotion_from_image
 from utils.context_mapper import map_emotion_to_context
 from utils.load_data import load_restaurants
 from recommender.embedding_model import (create_combined_features, create_embeddings)
@@ -310,21 +310,30 @@ embeddings = get_embeddings(restaurant_df)
 
 # ── Mood input ─────────────────────────────────────────────────────
 if is_cloud():
-    st.info("📍 Running on Streamlit Cloud — camera unavailable. Select your mood below.")
-    manual_mood = st.selectbox(
-        "Select your current mood:",
-        ["", "Happy 😄", "Sad 😔", "Stressed 😤", "Neutral 😐"],
-        key=f"manual_mood_{st.session_state['selectbox_key']}"
-    )
+    st.info("📍 Running on Streamlit Cloud — take a photo or select mood manually.")
+ 
+    camera_image = st.camera_input("Take a photo to detect your emotion")
+ 
+    with st.expander("Prefer to select manually instead?"):
+        manual_mood = st.selectbox(
+            "Select mood",
+            ["", "Happy 😄", "Sad 😔", "Stressed 😤", "Neutral 😐"],
+            key=f"manual_mood_{st.session_state['selectbox_key']}",
+            label_visibility="collapsed"
+        )
+ 
     scan = st.button("⬡  Get Recommendations")
+ 
 else:
     st.markdown("**Scan your face to detect your current emotional state.**")
     scan = st.button("⬡  Scan My Emotion")
+    camera_image = None
     with st.expander("No camera? Select mood manually instead"):
         manual_mood = st.selectbox(
-            "",
+            "Select mood",
             ["", "Happy 😄", "Sad 😔", "Stressed 😤", "Neutral 😐"],
-            key=f"manual_mood_{st.session_state['selectbox_key']}"
+            key=f"manual_mood_{st.session_state['selectbox_key']}",
+            label_visibility="collapsed"
         )
 
 # ── Mood map ───────────────────────────────────────────────────────
@@ -361,14 +370,20 @@ if scan:
             "emotion_scores": jitter(base["emotion_scores"])
         }
         detection_method = "manual input"
+ 
+    elif camera_image is not None:
+        with st.spinner("Analysing your photo..."):
+            result = detect_emotion_from_image(camera_image)
+        detection_method = "camera photo"
+ 
     else:
         if is_cloud():
-            st.warning("Please select a mood from the dropdown first.")
+            st.warning("⚠️ Please take a photo or select a mood first.")
             st.stop()
         with st.spinner("Scanning facial expression..."):
             result = detect_emotion()
         if result is None:
-            st.warning("Camera not detected. Please select a mood manually.")
+            st.warning("⚠️ Camera not detected. Please select a mood manually.")
             st.stop()
         detection_method = "facial scan"
 
